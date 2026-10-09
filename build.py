@@ -83,7 +83,8 @@ def main(out, user, repo, repo_version='2.0.0'):
                 os.makedirs(os.path.dirname(os.path.join(dest, asset.text)), exist_ok=True)
                 shutil.copy(os.path.join(src, asset.text), os.path.join(dest, asset.text))
         addons.append(node)
-        links.append((aid, ver, 'datadir/%s/%s' % (aid, zname)))
+        shutil.copy(os.path.join(dest, zname), out)  # also at the root: Kodi's web-source browser lists only same-folder links
+        links.append((aid, ver, zname))
         print('packed', aid, ver)
 
     shutil.rmtree(os.path.join(out, '.gen'))
@@ -95,15 +96,15 @@ def main(out, user, repo, repo_version='2.0.0'):
     with open(os.path.join(out, 'addons.xml.md5'), 'w') as f:
         f.write(md5)
 
-    # Kodi's file manager parses <a href> links, so this page doubles as an install source
+    # Kodi's file manager parses this page as a directory: it shows a link only when href == link text
     repo_zip = links[0][2]
-    rows = ''.join('<li><a href="%s">%s-%s.zip</a></li>\n' % (l, i, v) for i, v, l in links)
+    rows = ''.join('<li><a href="%s">%s</a></li>\n' % (z, z) for _, _, z in links)
     with open(os.path.join(out, 'index.html'), 'w', encoding='utf-8') as f:
         f.write('<!doctype html><meta charset="utf-8"><title>%s Kodi repository</title>\n'
                 '<h1>%s Kodi repository</h1>\n'
                 '<p>In Kodi: File manager &rarr; Add source &rarr; <code>%s</code>, then Add-ons &rarr; '
-                'Install from zip file &rarr; <a href="%s">%s</a></p>\n<ul>\n%s</ul>\n'
-                % (user, user, base, repo_zip, os.path.basename(repo_zip), rows))
+                'Install from zip file &rarr; <code>%s</code></p>\n<ul>\n%s</ul>\n'
+                % (user, user, base, repo_zip, rows))
 
 
 if __name__ == '__main__':
