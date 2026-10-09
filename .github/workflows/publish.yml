@@ -1,0 +1,42 @@
+name: Publish Kodi repository
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'  # daily, picks up new plugin commits without a submodule bump
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - name: Use latest plugin commits
+        run: git submodule update --remote
+      - name: Test add-ons
+        run: |
+          for d in src/*/; do
+            if [ -d "$d/tests" ]; then (cd "$d" && python3 -m unittest discover -s tests -t . -v); fi
+          done
+      - name: Build repository
+        run: python3 build.py _site "${GITHUB_REPOSITORY_OWNER}" "${GITHUB_REPOSITORY#*/}"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4
