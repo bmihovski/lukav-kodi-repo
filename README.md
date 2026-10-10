@@ -5,7 +5,8 @@ Forked from [lukavia/lukav-kodi-repo](https://github.com/lukavia/lukav-kodi-repo
 
 Addons (git submodules in `src/`, folder name = addon id):
 
-- `src/plugin.video.sprinttv` → [bmihovski/plugin.video.mtelnow](https://github.com/bmihovski/plugin.video.mtelnow) (Sprint IPTV)
+- `src/plugin.video.sprinttv` → bmihovski/plugin.video.sprinttv (private; Sprint IPTV). Only the add-on goes into the
+  published zips: its `tools/` and `tests/` stay in the private repo (see `SKIP` in `build.py`).
 
 ## Install in Kodi
 
@@ -21,6 +22,7 @@ Kodi then auto-updates the addon when a new version is published.
 `.github/workflows/publish.yml` runs on every push to `master`, daily, and on demand (Actions → Run workflow).
 It pulls the latest commit of each submodule's branch, so a plugin release only needs a version bump in its `addon.xml`.
 
-One-time setup: repo Settings → Pages → Source: **GitHub Actions**.
+One-time setup: repo Settings → Pages → Source: **GitHub Actions**; secret `PLUGIN_REPO_TOKEN`: a fine-grained token
+with read-only Contents access to the private add-on repo (the workflow checks the submodule out with it).
 
 Build locally: `python3 build.py _site bmihovski lukav-kodi-repo`

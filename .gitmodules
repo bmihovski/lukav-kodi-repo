@@ -1,4 +1,4 @@
 [submodule "src/plugin.video.sprinttv"]
 	path = src/plugin.video.sprinttv
-	url = https://github.com/bmihovski/plugin.video.mtelnow.git
-	branch = master
+	url = https://github.com/bmihovski/plugin.video.sprinttv.git
+	branch = main
